@@ -13,41 +13,24 @@ public enum MoveDirection
 public enum SelectionState
 {
     EMPTY,
-    ITEM_HIGHLIGHTED,
+    HOVERED_OVER,
     ITEM_PICKED
 }
 
 public class Player : MonoBehaviour {
 
     [SerializeField] private Item currentItem;
-    [SerializeField] private Item[,] inventory = new Item[5, 5];
-
     [SerializeField] private SelectionState selectionState;
 
-    void Start ()
+    [SerializeField] private Inventory inventory;
+
+    private void Start()
     {
-        UpdateItemsPositions();
     }
 
-    private void UpdateItemsPositions()
-    {
-        inventory = new Item[5, 5];
 
-        foreach (var item in GameObject.FindObjectsOfType<Item>())
-        {
-            var itemPosition = item.Position;
-            for (int x = itemPosition.x; x < itemPosition.x + item.size.x; x++)
-            {
-                for (int y = itemPosition.y; y < itemPosition.y + item.size.y; y++)
-                {
-                    inventory[x, y] = item;
-                }
-            }
-        }
-    }
-	
-	// Update is called once per frame
-	void Update () {
+    // Update is called once per frame
+    void Update () {
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             HandleInputDirection(MoveDirection.UP);
@@ -69,13 +52,25 @@ public class Player : MonoBehaviour {
         {
             switch (selectionState)
             {
-                case SelectionState.ITEM_HIGHLIGHTED:
+                case SelectionState.HOVERED_OVER:
                     selectionState = SelectionState.ITEM_PICKED;
-                    currentItem.SetPicked(true);
+                    currentItem.SetState(Item.State.PICKED);
                     break;
                 case SelectionState.ITEM_PICKED:
-                    selectionState = SelectionState.ITEM_HIGHLIGHTED;
-                    currentItem.SetPicked(false);
+                    var possibleOverlappingItem = inventory.Overlapping(currentItem);
+                    if (possibleOverlappingItem != null)
+                    {
+                        currentItem.SetState(Item.State.IDLE);
+                        currentItem = possibleOverlappingItem;
+                        currentItem.SetState(Item.State.PICKED);
+                    }
+                    else
+                    {
+                        currentItem.SetState(Item.State.HOVERED_OVER);
+                        selectionState = SelectionState.HOVERED_OVER;
+                    }
+
+                    inventory.UpdateItemsPositions();
                     break;
             }
         }
@@ -87,60 +82,47 @@ public class Player : MonoBehaviour {
         {
             case SelectionState.EMPTY:
                 Cursor.Instance.Move(direction);
-                var itemAtCursor = inventory[Cursor.Instance.Position.x, Cursor.Instance.Position.y];
+                var itemAtCursor = inventory.At(Cursor.Instance.Position.x, Cursor.Instance.Position.y);
                 if (itemAtCursor != null)
                 {
-                    itemAtCursor.SetSelected(true);
-                    selectionState = SelectionState.ITEM_HIGHLIGHTED;
+                    itemAtCursor.SetState(Item.State.HOVERED_OVER);
+                    selectionState = SelectionState.HOVERED_OVER;
                     currentItem = itemAtCursor;
                     Cursor.Instance.SetVisible(false);
                 }
                 break;
-            case SelectionState.ITEM_HIGHLIGHTED:
+            case SelectionState.HOVERED_OVER:
                 //TODO: Check if there is space for cursor
 
                 switch (direction)
                 {
                     case MoveDirection.UP:
-                        Cursor.Instance.Position = new Vector2Int(currentItem.Position.x, currentItem.Position.y + currentItem.size.y);
+                        Cursor.Instance.Position = new Vector2Int(currentItem.PPosition.x, currentItem.Rect.yMax + 1);
                         break;
                     case MoveDirection.DOWN:
-                        Cursor.Instance.Position = new Vector2Int(currentItem.Position.x, currentItem.Position.y - 1);
+                        Cursor.Instance.Position = new Vector2Int(currentItem.PPosition.x, currentItem.Rect.yMin - 1);
                         break;
                     case MoveDirection.LEFT:
-                        Cursor.Instance.Position = new Vector2Int(currentItem.Position.x - 1, currentItem.Position.y);
+                        Cursor.Instance.Position = new Vector2Int(currentItem.Rect.xMin - 1, currentItem.PPosition.y);
                         break;
                     case MoveDirection.RIGHT:
-                        Cursor.Instance.Position = new Vector2Int(currentItem.Position.x + currentItem.size.x, currentItem.Position.y);
+                        Cursor.Instance.Position = new Vector2Int(currentItem.Rect.xMax + 1, currentItem.PPosition.y);
                         break;
                 }
 
                 selectionState = SelectionState.EMPTY;
                 Cursor.Instance.SetVisible(true);
-                currentItem.SetSelected(false);
+                currentItem.SetState(Item.State.IDLE);
                 currentItem = null;
                 break;
             case SelectionState.ITEM_PICKED:
-                currentItem.Move(direction);
-                UpdateItemsPositions();
+                //Check if item can be moved
+                if (inventory.CanItemBeMoved(currentItem, direction))
+                {
+                    currentItem.Move(direction);
+                }
 
                 break;
         }
     }
-
-    //private void SetPartSelected(PlayerPart newSelectedPart)
-    //{
-    //    if (newSelectedPart == selectedPart)
-    //    {
-    //        return;
-    //    }
-
-    //    if (selectedPart != null)
-    //    {
-    //        //Deselect prev part
-    //        selectedPart.SetSelected(false);
-    //    }
-    //    selectedPart = newSelectedPart;
-    //    selectedPart.SetSelected(true);
-    //}
 }

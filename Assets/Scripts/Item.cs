@@ -4,10 +4,20 @@ using UnityEngine;
 
 public class Item : MonoBehaviour {
 
-    public Vector2Int size;
+    public enum State
+    {
+        IDLE,
+        HOVERED_OVER,
+        PICKED
+    }
+
+    [SerializeField] private Vector2Int size;
     [SerializeField] SpriteRenderer[] itemSprites;
 
-    public Vector2Int Position
+    private Color originalColor;
+    private Vector3 orignalScale;
+
+    public Vector2Int PPosition
     {
         get
         {
@@ -19,19 +29,35 @@ public class Item : MonoBehaviour {
         }
     }
 
-    public void SetSelected(bool isSelected)
+    public RectInt Rect
     {
-        foreach (var sprite in itemSprites)
+        get
         {
-            sprite.color = isSelected ? Color.green : Color.white;
+            Vector2Int position = new Vector2Int((int)transform.position.x, (int)transform.position.y);
+            RectInt rect = new RectInt(position, size - Vector2Int.one);
+            return rect;
         }
     }
 
-    public void SetPicked(bool isPicked)
+    public void SetState(State state)
     {
         foreach (var sprite in itemSprites)
         {
-            sprite.color = isPicked ? Color.yellow : Color.white;
+            switch (state)
+            {
+                case State.IDLE:
+                    sprite.color = originalColor;
+                    sprite.transform.localScale = orignalScale;
+                    break;
+                case State.HOVERED_OVER:
+                    sprite.color = Color.Lerp(originalColor, Color.white, .5f);
+                    sprite.transform.localScale = orignalScale;
+                    break;
+                case State.PICKED:
+                    sprite.color = Color.white;
+                    sprite.transform.localScale = orignalScale * 1.1f;
+                    break;
+            }
         }
     }
 
@@ -53,7 +79,7 @@ public class Item : MonoBehaviour {
                 movementAmount = Vector2Int.right;
                 break;
         }
-        Position += movementAmount;
+        PPosition += movementAmount;
     }
 
     // Update is called once per frame
@@ -63,5 +89,10 @@ public class Item : MonoBehaviour {
 
     private void Start()
     {
+        foreach (var sprite in itemSprites)
+        {
+            originalColor = sprite.color;
+            orignalScale = sprite.transform.localScale;
+        }
     }
 }
