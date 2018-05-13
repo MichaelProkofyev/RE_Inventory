@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Enemy : EntityBase, IDamagable {
 
-    private int health;
+    [SerializeField] private int health;
     
     public void Damage(int amount)
     {

@@ -56,8 +56,10 @@ public class Player : SingletonComponent<Player> {
             HandleInputDirection(MoveDirection.RIGHT);
         }
 
-        System.Action dropItem = () =>
+        System.Func<Item> dropItem = () =>
         {
+            Item droppedItem = currentItem;
+
             var possibleOverlappingItem = inventory.Overlapping(currentItem);
             if (possibleOverlappingItem != null)
             {
@@ -72,7 +74,8 @@ public class Player : SingletonComponent<Player> {
             }
 
             inventory.UpdateItemsPositions();
-            inventory.PrintInventoryContents();
+            return droppedItem;
+            //inventory.PrintInventoryContents();
         };
 
         if (Input.GetKeyDown(KeyCode.LeftControl))
@@ -96,8 +99,8 @@ public class Player : SingletonComponent<Player> {
                     currentItem.Use();
                     break;
                 case SelectionState.ITEM_PICKED:
-                    currentItem.Use();
-                    dropItem();
+                    var droppedItem = dropItem();
+                    droppedItem.Use();
                     break;
             }
         }
@@ -129,16 +132,16 @@ public class Player : SingletonComponent<Player> {
                 switch (direction)
                 {
                     case MoveDirection.UP:
-                        Cursor.Instance.Position = new Vector2Int(currentItem.PPosition.x, currentItem.Rect.yMax + 1);
+                        Cursor.Instance.Position = new Vector2Int(currentItem.Position.x, currentItem.yMax + 1);
                         break;
                     case MoveDirection.DOWN:
-                        Cursor.Instance.Position = new Vector2Int(currentItem.PPosition.x, currentItem.Rect.yMin - 1);
+                        Cursor.Instance.Position = new Vector2Int(currentItem.Position.x, currentItem.yMin - 1);
                         break;
                     case MoveDirection.LEFT:
-                        Cursor.Instance.Position = new Vector2Int(currentItem.Rect.xMin - 1, currentItem.PPosition.y);
+                        Cursor.Instance.Position = new Vector2Int(currentItem.xMin - 1, currentItem.Position.y);
                         break;
                     case MoveDirection.RIGHT:
-                        Cursor.Instance.Position = new Vector2Int(currentItem.Rect.xMax + 1, currentItem.PPosition.y);
+                        Cursor.Instance.Position = new Vector2Int(currentItem.xMax + 1, currentItem.Position.y);
                         break;
                 }
 

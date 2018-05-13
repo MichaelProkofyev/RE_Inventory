@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class Inventory : SingletonComponent<Inventory> {
 
+    public enum ScanDirection
+    {
+        NONE,
+        LEFT_RIGHT,
+        RIGHT_LEFT
+    }
+
     public EntityBase[,] slots = new EntityBase[inventotyWidth, inventotyHeight];
 
     private const int inventotyWidth = 10;
@@ -16,15 +23,15 @@ public class Inventory : SingletonComponent<Inventory> {
 
         foreach (var entity in GameObject.FindObjectsOfType<EntityBase>())
         {
-            if (possibleHoldedItem != null && possibleHoldedItem == entity)
+            if (possibleHoldedItem == entity)
             {
                 //Don't keep the position of currently holded item in inventory (so overlapping items won't overwrite each other)
                 continue;
             }
-            var itemPosition = entity.PPosition;
-            for (int x = itemPosition.x; x <= entity.Rect.xMax; x++)
+            var itemPosition = entity.Position;
+            for (int x = itemPosition.x; x <= entity.xMax; x++)
             {
-                for (int y = itemPosition.y; y <= entity.Rect.yMax; y++)
+                for (int y = itemPosition.y; y <= entity.yMax; y++)
                 {
                     slots[x, y] = entity;
                 }
@@ -45,7 +52,26 @@ public class Inventory : SingletonComponent<Inventory> {
         }
     }
 
-    //public T 
+    public List<T> AtRect<T>(Vector2Int position, int width, int height, ScanDirection scanDirection) where T : EntityBase
+    {
+        //TODO: Use scan direction to sort the entries (LINQ?)
+        List<T> foundEntities = new List<T>();
+        for (int x = position.x; x < position.x + width && x < slots.GetLength(0); x++)
+        {
+            for (int y = position.y; y < position.y + height && y < slots.GetLength(1); y++)
+            {
+                T slotEntity = slots[x, y] as T;
+
+                if (slotEntity != null && foundEntities.Contains(slotEntity) == false)
+                {
+                    foundEntities.Add(slotEntity);
+                }
+
+            }
+        }
+
+        return foundEntities;
+    }
 
     public Item Overlapping(Item item)
     {
@@ -57,8 +83,8 @@ public class Inventory : SingletonComponent<Inventory> {
 
                 if (slotItem != null && slotItem != item)
                 {
-                    bool xWithin = item.Rect.xMin <= x && x <= item.Rect.xMax;
-                    bool yWithin = item.Rect.yMin <= y && y <= item.Rect.yMax;
+                    bool xWithin = item.xMin <= x && x <= item.xMax;
+                    bool yWithin = item.yMin <= y && y <= item.yMax;
                     if (yWithin && xWithin)
                     {
                         return slotItem;
@@ -78,34 +104,34 @@ public class Inventory : SingletonComponent<Inventory> {
         switch (direction)
         {
             case MoveDirection.UP:
-                if (item.Rect.yMax == height - 1) return false;
-                for (int x = item.PPosition.x; x <= item.Rect.xMax; x++)
+                if (item.yMax == height - 1) return false;
+                for (int x = item.Position.x; x <= item.xMax; x++)
                 {
-                    var possibleEnemyBlocker = At(x, item.Rect.yMax + 1) as Enemy;
+                    var possibleEnemyBlocker = At(x, item.yMax + 1) as Enemy;
                     if (possibleEnemyBlocker != null) return false;
                 }
                 break;
             case MoveDirection.DOWN:
-                if (item.Rect.yMin == 0) return false;
-                for (int x = item.PPosition.x; x <= item.Rect.xMax; x++)
+                if (item.yMin == 0) return false;
+                for (int x = item.Position.x; x <= item.xMax; x++)
                 {
-                    var possibleEnemyBlocker = At(x, item.Rect.yMin - 1) as Enemy;
+                    var possibleEnemyBlocker = At(x, item.yMin - 1) as Enemy;
                     if (possibleEnemyBlocker != null) return false;
                 }
                 break;
             case MoveDirection.LEFT:
-                if (item.Rect.xMin == 0) return false;
-                for (int y = item.PPosition.y; y <= item.Rect.yMax; y++)
+                if (item.xMin == 0) return false;
+                for (int y = item.Position.y; y <= item.yMax; y++)
                 {
-                    var possibleEnemyBlocker = At(item.Rect.xMin - 1, y) as Enemy;
+                    var possibleEnemyBlocker = At(item.xMin - 1, y) as Enemy;
                     if (possibleEnemyBlocker != null) return false;
                 }
                 break;
             case MoveDirection.RIGHT:
-                if (item.Rect.xMax == width - 1) return false;
-                for (int y = item.PPosition.y; y <= item.Rect.yMax; y++)
+                if (item.xMax == width - 1) return false;
+                for (int y = item.Position.y; y <= item.yMax; y++)
                 {
-                    var possibleEnemyBlocker = At(item.Rect.xMax + 1, y) as Enemy;
+                    var possibleEnemyBlocker = At(item.xMax + 1, y) as Enemy;
                     if (possibleEnemyBlocker != null) return false;
                 }
                 break;

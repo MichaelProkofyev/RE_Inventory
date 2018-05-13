@@ -53,6 +53,6 @@ public abstract class Item : EntityBase {
                 movementAmount = Vector2Int.right;
                 break;
         }
-        PPosition += movementAmount;
+        Position += movementAmount;
     }
 }
