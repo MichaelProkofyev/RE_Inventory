@@ -17,7 +17,7 @@ public enum SelectionState
     ITEM_PICKED
 }
 
-public class Player : MonoBehaviour {
+public class Player : SingletonComponent<Player> {
 
     [SerializeField] private Item currentItem;
     [SerializeField] private SelectionState selectionState;
@@ -28,6 +28,14 @@ public class Player : MonoBehaviour {
     {
     }
 
+    public Item CurrentlyHoldingItem()
+    {
+        if (selectionState == SelectionState.ITEM_PICKED && currentItem != null)
+        {
+            return currentItem;
+        }
+        return null;
+    }
 
     // Update is called once per frame
     void Update () {
@@ -48,29 +56,48 @@ public class Player : MonoBehaviour {
             HandleInputDirection(MoveDirection.RIGHT);
         }
 
+        System.Action dropItem = () =>
+        {
+            var possibleOverlappingItem = inventory.Overlapping(currentItem);
+            if (possibleOverlappingItem != null)
+            {
+                currentItem.SetState(ItemState.IDLE);
+                currentItem = possibleOverlappingItem;
+                currentItem.SetState(ItemState.PICKED);
+            }
+            else
+            {
+                currentItem.SetState(ItemState.HOVERED_OVER);
+                selectionState = SelectionState.HOVERED_OVER;
+            }
+
+            inventory.UpdateItemsPositions();
+            inventory.PrintInventoryContents();
+        };
+
         if (Input.GetKeyDown(KeyCode.LeftControl))
         {
             switch (selectionState)
             {
                 case SelectionState.HOVERED_OVER:
                     selectionState = SelectionState.ITEM_PICKED;
-                    currentItem.SetState(Item.State.PICKED);
+                    currentItem.SetState(ItemState.PICKED);
                     break;
                 case SelectionState.ITEM_PICKED:
-                    var possibleOverlappingItem = inventory.Overlapping(currentItem);
-                    if (possibleOverlappingItem != null)
-                    {
-                        currentItem.SetState(Item.State.IDLE);
-                        currentItem = possibleOverlappingItem;
-                        currentItem.SetState(Item.State.PICKED);
-                    }
-                    else
-                    {
-                        currentItem.SetState(Item.State.HOVERED_OVER);
-                        selectionState = SelectionState.HOVERED_OVER;
-                    }
-
-                    inventory.UpdateItemsPositions();
+                    dropItem();
+                    break;
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftAlt))
+        {
+            switch (selectionState)
+            {
+                case SelectionState.HOVERED_OVER:
+                    currentItem.Use();
+                    break;
+                case SelectionState.ITEM_PICKED:
+                    currentItem.Use();
+                    dropItem();
                     break;
             }
         }
@@ -80,10 +107,10 @@ public class Player : MonoBehaviour {
     {
         System.Func<bool> tryHoverOverItem = () =>
         {
-            var itemAtCursor = inventory.At(Cursor.Instance.Position.x, Cursor.Instance.Position.y);
+            var itemAtCursor = inventory.At(Cursor.Instance.Position.x, Cursor.Instance.Position.y) as Item;
             if (itemAtCursor != null)
             {
-                itemAtCursor.SetState(Item.State.HOVERED_OVER);
+                itemAtCursor.SetState(ItemState.HOVERED_OVER);
                 selectionState = SelectionState.HOVERED_OVER;
                 currentItem = itemAtCursor;
                 Cursor.Instance.SetVisible(false);
@@ -114,8 +141,9 @@ public class Player : MonoBehaviour {
                         Cursor.Instance.Position = new Vector2Int(currentItem.Rect.xMax + 1, currentItem.PPosition.y);
                         break;
                 }
+
                 //Deselect currently hovered over item
-                currentItem.SetState(Item.State.IDLE);
+                currentItem.SetState(ItemState.IDLE);
                 if (tryHoverOverItem() == false)
                 {
                     selectionState = SelectionState.EMPTY;

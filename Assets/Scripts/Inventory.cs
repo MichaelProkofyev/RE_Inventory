@@ -4,26 +4,35 @@ using UnityEngine;
 
 public class Inventory : SingletonComponent<Inventory> {
 
-    public Item[,] slots = new Item[10, 5];
+    public EntityBase[,] slots = new EntityBase[inventotyWidth, inventotyHeight];
+
+    private const int inventotyWidth = 10;
+    private const int inventotyHeight = 5;
 
     public void UpdateItemsPositions()
     {
-        slots = new Item[10, 5];
+        slots = new EntityBase[inventotyWidth, inventotyHeight];
+        Item possibleHoldedItem = Player.Instance.CurrentlyHoldingItem();
 
-        foreach (var item in GameObject.FindObjectsOfType<Item>())
+        foreach (var entity in GameObject.FindObjectsOfType<EntityBase>())
         {
-            var itemPosition = item.PPosition;
-            for (int x = itemPosition.x; x <= item.Rect.xMax; x++)
+            if (possibleHoldedItem != null && possibleHoldedItem == entity)
             {
-                for (int y = itemPosition.y; y <= item.Rect.yMax; y++)
+                //Don't keep the position of currently holded item in inventory (so overlapping items won't overwrite each other)
+                continue;
+            }
+            var itemPosition = entity.PPosition;
+            for (int x = itemPosition.x; x <= entity.Rect.xMax; x++)
+            {
+                for (int y = itemPosition.y; y <= entity.Rect.yMax; y++)
                 {
-                    slots[x, y] = item;
+                    slots[x, y] = entity;
                 }
             }
         }
     }
 
-    public Item At(int x, int y)
+    public EntityBase At(int x, int y)
     {
         if (0 <= x && x < slots.GetLength(0) && 0 <= y && y < slots.GetLength(1))
         {
@@ -36,18 +45,20 @@ public class Inventory : SingletonComponent<Inventory> {
         }
     }
 
+    //public T 
+
     public Item Overlapping(Item item)
     {
         for (int x = 0; x < slots.GetLength(0); x++)
         {
             for (int y = 0; y < slots.GetLength(1); y++)
             {
-                Item slotItem = slots[x, y];
+                Item slotItem = slots[x, y] as Item;
 
                 if (slotItem != null && slotItem != item)
                 {
-                    bool yWithin = item.Rect.yMin <= y && item.Rect.yMax >= y;
-                    bool xWithin = item.Rect.xMin <= x && item.Rect.xMax >= x;
+                    bool xWithin = item.Rect.xMin <= x && x <= item.Rect.xMax;
+                    bool yWithin = item.Rect.yMin <= y && y <= item.Rect.yMax;
                     if (yWithin && xWithin)
                     {
                         return slotItem;
@@ -68,15 +79,35 @@ public class Inventory : SingletonComponent<Inventory> {
         {
             case MoveDirection.UP:
                 if (item.Rect.yMax == height - 1) return false;
+                for (int x = item.PPosition.x; x <= item.Rect.xMax; x++)
+                {
+                    var possibleEnemyBlocker = At(x, item.Rect.yMax + 1) as Enemy;
+                    if (possibleEnemyBlocker != null) return false;
+                }
                 break;
             case MoveDirection.DOWN:
                 if (item.Rect.yMin == 0) return false;
+                for (int x = item.PPosition.x; x <= item.Rect.xMax; x++)
+                {
+                    var possibleEnemyBlocker = At(x, item.Rect.yMin - 1) as Enemy;
+                    if (possibleEnemyBlocker != null) return false;
+                }
                 break;
             case MoveDirection.LEFT:
                 if (item.Rect.xMin == 0) return false;
+                for (int y = item.PPosition.y; y <= item.Rect.yMax; y++)
+                {
+                    var possibleEnemyBlocker = At(item.Rect.xMin - 1, y) as Enemy;
+                    if (possibleEnemyBlocker != null) return false;
+                }
                 break;
             case MoveDirection.RIGHT:
                 if (item.Rect.xMax == width - 1) return false;
+                for (int y = item.PPosition.y; y <= item.Rect.yMax; y++)
+                {
+                    var possibleEnemyBlocker = At(item.Rect.xMax + 1, y) as Enemy;
+                    if (possibleEnemyBlocker != null) return false;
+                }
                 break;
         }
         return true;
@@ -87,4 +118,34 @@ public class Inventory : SingletonComponent<Inventory> {
         UpdateItemsPositions();
     }
 
+    void Update()
+    {
+        //Debug purposes
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            PrintInventoryContents();
+        }
+    }
+
+    public void PrintInventoryContents()
+    {
+        string inventoryDescription = string.Empty;
+        for (int y = slots.GetLength(1) - 1; y >= 0; y--)
+        {
+            for (int x = 0; x < slots.GetLength(0); x++)
+            {
+                EntityBase slotEntity = slots[x, y] as EntityBase;
+                if (slotEntity != null)
+                {
+                    inventoryDescription += slotEntity.gameObject.name + " ";
+                }
+                else
+                {
+                    inventoryDescription += "0 ";
+                }
+            }
+            inventoryDescription += "\n";
+        }
+        print(inventoryDescription);
+    }
 }
