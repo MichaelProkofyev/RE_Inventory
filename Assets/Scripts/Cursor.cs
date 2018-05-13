@@ -14,7 +14,25 @@ public class Cursor : SingletonComponent<Cursor> {
         }
         set
         {
-            transform.position = new Vector3Int(value.x, value.y, 0);
+            if (value.x >= Inventory.Instance.slots.GetLength(0))
+            {
+                value.x = 0;
+            }
+            else if(value.x < 0)
+            {
+                value.x = Inventory.Instance.slots.GetLength(0) - 1;
+            }
+
+            if (value.y >= Inventory.Instance.slots.GetLength(1))
+            {
+                value.y = 0;
+            }
+            else if (value.y < 0)
+            {
+                value.y = Inventory.Instance.slots.GetLength(1) - 1;
+            }
+
+            transform.position = new Vector3Int( value.x, value.y, 0);
         }
     }
 

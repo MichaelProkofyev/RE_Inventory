@@ -78,22 +78,27 @@ public class Player : MonoBehaviour {
 
     private void HandleInputDirection(MoveDirection direction)
     {
+        System.Func<bool> tryHoverOverItem = () =>
+        {
+            var itemAtCursor = inventory.At(Cursor.Instance.Position.x, Cursor.Instance.Position.y);
+            if (itemAtCursor != null)
+            {
+                itemAtCursor.SetState(Item.State.HOVERED_OVER);
+                selectionState = SelectionState.HOVERED_OVER;
+                currentItem = itemAtCursor;
+                Cursor.Instance.SetVisible(false);
+                return true;
+            }
+            return false;
+        };
+
         switch (selectionState)
         {
             case SelectionState.EMPTY:
                 Cursor.Instance.Move(direction);
-                var itemAtCursor = inventory.At(Cursor.Instance.Position.x, Cursor.Instance.Position.y);
-                if (itemAtCursor != null)
-                {
-                    itemAtCursor.SetState(Item.State.HOVERED_OVER);
-                    selectionState = SelectionState.HOVERED_OVER;
-                    currentItem = itemAtCursor;
-                    Cursor.Instance.SetVisible(false);
-                }
+                tryHoverOverItem();
                 break;
             case SelectionState.HOVERED_OVER:
-                //TODO: Check if there is space for cursor
-
                 switch (direction)
                 {
                     case MoveDirection.UP:
@@ -109,11 +114,15 @@ public class Player : MonoBehaviour {
                         Cursor.Instance.Position = new Vector2Int(currentItem.Rect.xMax + 1, currentItem.PPosition.y);
                         break;
                 }
-
-                selectionState = SelectionState.EMPTY;
-                Cursor.Instance.SetVisible(true);
+                //Deselect currently hovered over item
                 currentItem.SetState(Item.State.IDLE);
-                currentItem = null;
+                if (tryHoverOverItem() == false)
+                {
+                    selectionState = SelectionState.EMPTY;
+                    Cursor.Instance.SetVisible(true);
+                    currentItem = null;
+                }
+
                 break;
             case SelectionState.ITEM_PICKED:
                 //Check if item can be moved
