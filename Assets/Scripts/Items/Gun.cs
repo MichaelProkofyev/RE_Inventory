@@ -9,9 +9,12 @@ public class Gun : Item {
     [SerializeField] private int fireRange;
     [SerializeField] private int damage;
 
+    private Vector2Int originalFirePoint;
+
     public override void Use()
     {
-        var possibleTargets = Inventory.Instance.AtRect<EntityBase>(Position + firePoint, fireRange, 1, Inventory.ScanDirection.NONE);
+        int properlyFlippedFireRange = flippedX ? -fireRange : fireRange;
+        var possibleTargets = Inventory.Instance.AtRect<EntityBase>(Position + firePoint, properlyFlippedFireRange, 1, Inventory.ScanDirection.NONE);
         var damagableTargets = possibleTargets.OfType<IDamagable>();
         if (damagableTargets.Any())
         {
@@ -21,5 +24,36 @@ public class Gun : Item {
         //{
         //    print(target.gameObject.name);
         //}
+    }
+
+    public override void Flip(bool flipX, bool flipY)
+    {
+        base.Flip(flipX, flipY);
+
+        if (flipX)
+        {
+            firePoint.x = size.x - 1 - originalFirePoint.x;
+        }
+        else
+        {
+            firePoint.x = originalFirePoint.x;
+        }
+
+        if (flipY)
+        {
+            firePoint.y = size.y - 1 - originalFirePoint.y;
+        }
+        else
+        {
+            firePoint.y = originalFirePoint.y;
+        }
+
+        print(firePoint);
+    }
+
+    protected override void Start()
+    {
+        base.Start();
+        originalFirePoint = firePoint;
     }
 }

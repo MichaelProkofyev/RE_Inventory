@@ -41,7 +41,7 @@ public abstract class EntityBase : MonoBehaviour {
         get { return Position.x; }
     }
 
-    private void Start()
+    protected virtual void Start()
     {
         foreach (var sprite in sprites)
         {

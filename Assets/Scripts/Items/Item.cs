@@ -13,6 +13,9 @@ public abstract class Item : EntityBase {
 
     public abstract void Use();
 
+    protected bool flippedX = false;
+    protected bool flippedY = false;
+
     public void SetState(ItemState state)
     {
         foreach (var sprite in sprites)
@@ -54,5 +57,28 @@ public abstract class Item : EntityBase {
                 break;
         }
         Position += movementAmount;
+    }
+
+    public virtual void ToggleFlipX()
+    {
+        flippedX = !flippedX;
+        Flip(flippedX, flippedY);
+    }
+
+    public virtual void ToggleFlipY()
+    {
+        flippedY = !flippedY;
+        Flip(flippedX, flippedY);
+    }
+
+    public virtual void Flip(bool flipX, bool flipY)
+    {
+        flippedX = flipX;
+        flippedY = flipY;
+        foreach (var sprite in sprites)
+        {
+            sprite.flipX = flippedX;
+            sprite.flipY = flippedY;
+        }
     }
 }
