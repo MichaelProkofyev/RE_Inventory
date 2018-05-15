@@ -9,6 +9,20 @@ public enum ItemState
     PICKED
 }
 
+public struct ItemRect
+{
+    public Vector2Int position;
+    public int width;
+    public int height;
+
+    public ItemRect(Vector2Int position, int width, int height)
+    {
+        this.position = position;
+        this.width = width;
+        this.height = height;
+    }
+}
+
 public abstract class Item : EntityBase {
 
     public abstract void Use();
@@ -16,7 +30,9 @@ public abstract class Item : EntityBase {
     protected bool flippedX = false;
     protected bool flippedY = false;
 
-    public void SetState(ItemState state)
+    public abstract ItemRect UseRange { get; }
+
+    public virtual void SetState(ItemState state)
     {
         foreach (var sprite in sprites)
         {

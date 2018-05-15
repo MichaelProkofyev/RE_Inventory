@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -97,8 +98,10 @@ public class Player : SingletonComponent<Player> {
                 case SelectionState.HOVERED_OVER:
                     selectionState = SelectionState.ITEM_PICKED;
                     currentItem.SetState(ItemState.PICKED);
+                    Inventory.Instance.ShowInteractionRangeTilesAt(currentItem.UseRange);
                     break;
                 case SelectionState.ITEM_PICKED:
+                    Inventory.Instance.HideInteractionRangeTiles();
                     dropItem();
                     break;
             }
@@ -172,6 +175,7 @@ public class Player : SingletonComponent<Player> {
                 if (inventory.CanItemBeMoved(currentItem, direction))
                 {
                     currentItem.Move(direction);
+                    Inventory.Instance.ShowInteractionRangeTilesAt(currentItem.UseRange);
                 }
 
                 break;

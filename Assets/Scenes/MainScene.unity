@@ -1658,6 +1658,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26f79ee99074e134fb12faf571aafa8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  interactionRangeTilePrefab: {fileID: 1882600703686838, guid: ed97f43b75a495343912c5e464056b80,
+    type: 2}
+  currentInteractionRangeTiles: []
 --- !u!4 &1953066181
 Transform:
   m_ObjectHideFlags: 0

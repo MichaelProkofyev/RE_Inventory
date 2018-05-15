@@ -16,6 +16,10 @@ public class Inventory : SingletonComponent<Inventory> {
     private const int inventotyWidth = 10;
     private const int inventotyHeight = 5;
 
+    [SerializeField] private GameObject interactionRangeTilePrefab;
+
+    [SerializeField] private List<GameObject> currentInteractionRangeTiles;
+
     public void UpdateItemsPositions()
     {
         slots = new EntityBase[inventotyWidth, inventotyHeight];
@@ -71,6 +75,28 @@ public class Inventory : SingletonComponent<Inventory> {
         }
 
         return foundEntities;
+    }
+
+    public void ShowInteractionRangeTilesAt(ItemRect useRect)
+    {
+        HideInteractionRangeTiles();
+        for (int x = useRect.position.x; x < useRect.position.x + useRect.width && x < slots.GetLength(0); x++)
+        {
+            for (int y = useRect.position.y; y < useRect.position.y + useRect.height && y < slots.GetLength(1); y++)
+            {
+                var interactionRangeTile = SimplePool.Spawn(interactionRangeTilePrefab, new Vector3Int(x, y, 0), Quaternion.identity);
+                currentInteractionRangeTiles.Add(interactionRangeTile);
+            }
+        }
+    }
+
+    public void HideInteractionRangeTiles()
+    {
+        foreach (var tile in currentInteractionRangeTiles)
+        {
+            SimplePool.Despawn(tile);
+        }
+        currentInteractionRangeTiles.Clear();
     }
 
     public Item Overlapping(Item item)

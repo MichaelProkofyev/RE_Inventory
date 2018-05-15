@@ -11,6 +11,15 @@ public class Gun : Item {
 
     private Vector2Int originalFirePoint;
 
+    public override ItemRect UseRange
+    {
+        get
+        {
+            int properlyFlippedFireRange = flippedX ? -fireRange : fireRange;
+            return new ItemRect(Position + firePoint, properlyFlippedFireRange, 1);
+        }
+    }
+
     public override void Use()
     {
         int properlyFlippedFireRange = flippedX ? -fireRange : fireRange;
@@ -25,6 +34,24 @@ public class Gun : Item {
         //    print(target.gameObject.name);
         //}
     }
+
+    public override void SetState(ItemState state)
+    {
+        base.SetState(state);
+
+        switch (state)
+        {
+            case ItemState.IDLE:
+                break;
+            case ItemState.HOVERED_OVER:
+                break;
+            case ItemState.PICKED:
+                break;
+            default:
+                break;
+        }
+    }
+
 
     public override void Flip(bool flipX, bool flipY)
     {
