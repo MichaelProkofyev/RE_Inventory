@@ -102,18 +102,6 @@ public class Player : SingletonComponent<Player> {
                     break;
                 case SelectionState.ITEM_PICKED:
                     Inventory.Instance.HideInteractionRangeTiles();
-                    dropItem();
-                    break;
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.LeftAlt))
-        {
-            switch (selectionState)
-            {
-                case SelectionState.HOVERED_OVER:
-                    currentItem.Use();
-                    break;
-                case SelectionState.ITEM_PICKED:
                     var droppedItem = dropItem();
                     droppedItem.Use();
                     break;
