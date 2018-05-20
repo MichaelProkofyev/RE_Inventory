@@ -5,6 +5,7 @@ using UnityEngine;
 public abstract class EntityBase : MonoBehaviour {
     public Vector2Int size;
     [SerializeField] protected SpriteRenderer[] sprites;
+    [SerializeField] protected ObjectShake[] objectShakers;
 
     protected Color originalColor;
     protected Vector3 orignalScale;
@@ -48,5 +49,7 @@ public abstract class EntityBase : MonoBehaviour {
             originalColor = sprite.color;
             orignalScale = sprite.transform.localScale;
         }
+
+        objectShakers = GetComponentsInChildren<ObjectShake>();
     }
 }

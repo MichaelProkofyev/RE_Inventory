@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Inventory : SingletonComponent<Inventory> {
 
@@ -11,15 +12,17 @@ public class Inventory : SingletonComponent<Inventory> {
         RIGHT_LEFT
     }
 
+    [SerializeField] private GameObject interactionRangeTilePrefab;
+    [SerializeField] private List<GameObject> currentInteractionRangeTiles;
+    [SerializeField] private Text capacityTitle;
+
     public EntityBase[,] slots = new EntityBase[inventotyWidth, inventotyHeight];
 
     private const int inventotyWidth = 10;
     private const int inventotyHeight = 5;
 
-    [SerializeField] private GameObject interactionRangeTilePrefab;
 
-    [SerializeField] private List<GameObject> currentInteractionRangeTiles;
-
+    //Should picked items be omitted ?
     public void UpdateItemsPositions()
     {
         slots = new EntityBase[inventotyWidth, inventotyHeight];
@@ -32,6 +35,13 @@ public class Inventory : SingletonComponent<Inventory> {
                 //Don't keep the position of currently holded item in inventory (so overlapping items won't overwrite each other)
                 continue;
             }
+            var possibleDamagable = entity as IDamagable;
+            bool justDiedEntity = possibleDamagable != null && possibleDamagable.IsAlive() == false;
+            if (justDiedEntity)
+            {
+                //Entity that died this frame & didn't get destroyed yet should be skipped
+                continue;
+            }
             var itemPosition = entity.Position;
             for (int x = itemPosition.x; x <= entity.xMax; x++)
             {
@@ -40,6 +50,24 @@ public class Inventory : SingletonComponent<Inventory> {
                     slots[x, y] = entity;
                 }
             }
+        }
+
+        //Update invetory copacity
+        {
+            int filledAmount = 0;
+            foreach (var slot in slots)
+            {
+                if (slot != null)
+                {
+                    filledAmount++;
+                }
+            }
+            //Count the item thats not in the slots, but currently holding
+            if (possibleHoldedItem != null)
+            {
+                filledAmount += possibleHoldedItem.size.x * possibleHoldedItem.size.y;
+            }
+            capacityTitle.text = $"{filledAmount}/{inventotyWidth * inventotyHeight}";
         }
     }
 
@@ -168,6 +196,7 @@ public class Inventory : SingletonComponent<Inventory> {
     void Start()
     {
         UpdateItemsPositions();
+        Player.Instance.OnPlayerAction += UpdateItemsPositions;
     }
 
     void Update()

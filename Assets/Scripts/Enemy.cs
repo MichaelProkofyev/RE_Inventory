@@ -9,23 +9,23 @@ public class Enemy : EntityBase, IDamagable {
     public void Damage(int amount)
     {
         health -= amount;
+        foreach (var shake in objectShakers)
+        {
+            shake.ShakeObject();
+        }
         if (health <= 0)
         {
             GameObject.Destroy(gameObject);
         }
     }
 
+    public bool IsAlive()
+    {
+        return health > 0;
+    }
+
     void Update()
     {
 
-    }
-
-    private void Start()
-    {
-        foreach (var sprite in sprites)
-        {
-            originalColor = sprite.color;
-            orignalScale = sprite.transform.localScale;
-        }
     }
 }

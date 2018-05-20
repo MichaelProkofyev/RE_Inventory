@@ -143,6 +143,7 @@ MonoBehaviour:
   size: {x: 3, y: 2}
   sprites:
   - {fileID: 1915213312}
+  objectShakers: []
   firePoint: {x: 3, y: 1}
   fireRange: 10
   damage: 5
@@ -169,6 +170,7 @@ GameObject:
   m_Component:
   - component: {fileID: 342467919}
   - component: {fileID: 342467918}
+  - component: {fileID: 342467920}
   m_Layer: 0
   m_Name: Sprite
   m_TagString: Untagged
@@ -235,6 +237,22 @@ Transform:
   m_Father: {fileID: 1051043228}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &342467920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 342467917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 640033bf3b9e9854eaa4744378f45b1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  debugMode: 0
+  shakeAmount: 1
+  shakeDuration: 0.2
+  smooth: 0
+  smoothAmount: 5
 --- !u!1 &469594574
 GameObject:
   m_ObjectHideFlags: 0
@@ -474,7 +492,7 @@ GameObject:
   - component: {fileID: 521544921}
   - component: {fileID: 521544920}
   m_Layer: 5
-  m_Name: Inventory Title
+  m_Name: FilleAmountTitle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -532,7 +550,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: INVENTORY
+  m_Text: 5/50
 --- !u!222 &521544921
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -866,6 +884,7 @@ MonoBehaviour:
   size: {x: 1, y: 2}
   sprites:
   - {fileID: 342467918}
+  objectShakers: []
 --- !u!4 &1051043228
 Transform:
   m_ObjectHideFlags: 0
@@ -1044,6 +1063,7 @@ MonoBehaviour:
   size: {x: 1, y: 1}
   sprites:
   - {fileID: 1686321054}
+  objectShakers: []
   health: 10
 --- !u!4 &1602026576
 Transform:
@@ -1068,6 +1088,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1686321055}
   - component: {fileID: 1686321054}
+  - component: {fileID: 1686321056}
   m_Layer: 0
   m_Name: New Sprite
   m_TagString: Untagged
@@ -1134,6 +1155,22 @@ Transform:
   m_Father: {fileID: 1602026576}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1686321056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1686321053}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 640033bf3b9e9854eaa4744378f45b1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  debugMode: 0
+  shakeAmount: 1
+  shakeDuration: 0.2
+  smooth: 1
+  smoothAmount: 5
 --- !u!1 &1894155431
 GameObject:
   m_ObjectHideFlags: 0
@@ -1738,6 +1775,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1915213311}
   - component: {fileID: 1915213312}
+  - component: {fileID: 1915213313}
   m_Layer: 0
   m_Name: Sprite
   m_TagString: Untagged
@@ -1804,6 +1842,22 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1915213313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1915213310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 640033bf3b9e9854eaa4744378f45b1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  debugMode: 0
+  shakeAmount: 1
+  shakeDuration: 0.2
+  smooth: 0
+  smoothAmount: 5
 --- !u!1 &1953066179
 GameObject:
   m_ObjectHideFlags: 0
@@ -1834,6 +1888,7 @@ MonoBehaviour:
   interactionRangeTilePrefab: {fileID: 1882600703686838, guid: ed97f43b75a495343912c5e464056b80,
     type: 2}
   currentInteractionRangeTiles: []
+  capacityTitle: {fileID: 521544920}
 --- !u!4 &1953066181
 Transform:
   m_ObjectHideFlags: 0

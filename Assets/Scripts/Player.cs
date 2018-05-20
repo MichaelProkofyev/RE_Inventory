@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,8 +23,9 @@ public class Player : SingletonComponent<Player> {
 
     [SerializeField] private Item currentItem;
     [SerializeField] private SelectionState selectionState;
-
     [SerializeField] private Inventory inventory;
+
+    public Action OnPlayerAction = () => { };
 
     private void Start()
     {
@@ -62,10 +64,12 @@ public class Player : SingletonComponent<Player> {
             if (Input.GetKeyDown(KeyCode.Keypad8) || Input.GetKeyDown(KeyCode.Keypad2))
             {
                 currentItem.ToggleFlipY();
+                OnPlayerAction();
             }
             else if (Input.GetKeyDown(KeyCode.Keypad4) || Input.GetKeyDown(KeyCode.Keypad6))
             {
                 currentItem.ToggleFlipX();
+                OnPlayerAction();
             }
         }
 
@@ -86,7 +90,6 @@ public class Player : SingletonComponent<Player> {
                 selectionState = SelectionState.HOVERED_OVER;
             }
 
-            inventory.UpdateItemsPositions();
             return droppedItem;
             //inventory.PrintInventoryContents();
         };
@@ -106,6 +109,7 @@ public class Player : SingletonComponent<Player> {
                     droppedItem.Use();
                     break;
             }
+            OnPlayerAction();
         }
     }
 
@@ -168,5 +172,7 @@ public class Player : SingletonComponent<Player> {
 
                 break;
         }
+
+        OnPlayerAction();
     }
 }
