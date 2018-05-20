@@ -150,7 +150,7 @@ public class Inventory : SingletonComponent<Inventory> {
         return null;
     }
 
-    public bool CanItemBeMoved(Item item, MoveDirection direction)
+    public bool CanItemBeMoved(EntityBase entity, MoveDirection direction, bool itemsAreBlockers)
     {
         int width = slots.GetLength(0);
         int height = slots.GetLength(1);
@@ -158,35 +158,55 @@ public class Inventory : SingletonComponent<Inventory> {
         switch (direction)
         {
             case MoveDirection.UP:
-                if (item.yMax == height - 1) return false;
-                for (int x = item.Position.x; x <= item.xMax; x++)
+                if (entity.yMax == height - 1) return false;
+                for (int x = entity.Position.x; x <= entity.xMax; x++)
                 {
-                    var possibleEnemyBlocker = At(x, item.yMax + 1) as Enemy;
+                    var possibleEnemyBlocker = At(x, entity.yMax + 1) as Enemy;
                     if (possibleEnemyBlocker != null) return false;
+                    if (itemsAreBlockers)
+                    {
+                        var possibleItemBlocker = At(x, entity.yMax + 1) as Item;
+                        if (possibleItemBlocker != null) return false;
+                    }
                 }
                 break;
             case MoveDirection.DOWN:
-                if (item.yMin == 0) return false;
-                for (int x = item.Position.x; x <= item.xMax; x++)
+                if (entity.yMin == 0) return false;
+                for (int x = entity.Position.x; x <= entity.xMax; x++)
                 {
-                    var possibleEnemyBlocker = At(x, item.yMin - 1) as Enemy;
+                    var possibleEnemyBlocker = At(x, entity.yMin - 1) as Enemy;
                     if (possibleEnemyBlocker != null) return false;
+                    if (itemsAreBlockers)
+                    {
+                        var possibleItemBlocker = At(x, entity.yMin - 1) as Item;
+                        if (possibleItemBlocker != null) return false;
+                    }
                 }
                 break;
             case MoveDirection.LEFT:
-                if (item.xMin == 0) return false;
-                for (int y = item.Position.y; y <= item.yMax; y++)
+                if (entity.xMin == 0) return false;
+                for (int y = entity.Position.y; y <= entity.yMax; y++)
                 {
-                    var possibleEnemyBlocker = At(item.xMin - 1, y) as Enemy;
+                    var possibleEnemyBlocker = At(entity.xMin - 1, y) as Enemy;
                     if (possibleEnemyBlocker != null) return false;
+                    if (itemsAreBlockers)
+                    {
+                        var possibleItemBlocker = At(entity.xMin - 1, y) as Item;
+                        if (possibleItemBlocker != null) return false;
+                    }
                 }
                 break;
             case MoveDirection.RIGHT:
-                if (item.xMax == width - 1) return false;
-                for (int y = item.Position.y; y <= item.yMax; y++)
+                if (entity.xMax == width - 1) return false;
+                for (int y = entity.Position.y; y <= entity.yMax; y++)
                 {
-                    var possibleEnemyBlocker = At(item.xMax + 1, y) as Enemy;
+                    var possibleEnemyBlocker = At(entity.xMax + 1, y) as Enemy;
                     if (possibleEnemyBlocker != null) return false;
+                    if (itemsAreBlockers)
+                    {
+                        var possibleItemBlocker = At(entity.xMax + 1, y) as Item;
+                        if (possibleItemBlocker != null) return false;
+                    }
                 }
                 break;
         }
@@ -197,6 +217,7 @@ public class Inventory : SingletonComponent<Inventory> {
     {
         UpdateItemsPositions();
         Player.Instance.OnPlayerAction += UpdateItemsPositions;
+        GameController.Instance.OnAIAction += UpdateItemsPositions;
     }
 
     void Update()

@@ -164,7 +164,7 @@ public class Player : SingletonComponent<Player> {
                 break;
             case SelectionState.ITEM_PICKED:
                 //Check if item can be moved
-                if (inventory.CanItemBeMoved(currentItem, direction))
+                if (inventory.CanItemBeMoved(currentItem, direction, false))
                 {
                     currentItem.Move(direction);
                     Inventory.Instance.ShowInteractionRangeTilesAt(currentItem.UseRange);

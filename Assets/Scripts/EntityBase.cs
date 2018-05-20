@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class EntityBase : MonoBehaviour {
+public abstract class EntityBase : MonoBehaviour, System.IComparable<EntityBase>
+{
     public Vector2Int size;
     [SerializeField] protected SpriteRenderer[] sprites;
     [SerializeField] protected ObjectShake[] objectShakers;
@@ -40,6 +41,39 @@ public abstract class EntityBase : MonoBehaviour {
     public int xMin
     {
         get { return Position.x; }
+    }
+
+    public void Move(MoveDirection direction)
+    {
+        Vector2Int movementAmount = Vector2Int.zero;
+        switch (direction)
+        {
+            case MoveDirection.UP:
+                movementAmount = Vector2Int.up;
+                break;
+            case MoveDirection.DOWN:
+                movementAmount = Vector2Int.down;
+                break;
+            case MoveDirection.LEFT:
+                movementAmount = Vector2Int.left;
+                break;
+            case MoveDirection.RIGHT:
+                movementAmount = Vector2Int.right;
+                break;
+        }
+        Position += movementAmount;
+    }
+
+    public int CompareTo(EntityBase other)
+    {
+        if (Position.x.CompareTo(other.Position.x) != 0)
+        {
+            return Position.x.CompareTo(other.Position.x);
+        }
+        else
+        {
+            return Position.y.CompareTo(other.Position.y);
+        }
     }
 
     protected virtual void Start()

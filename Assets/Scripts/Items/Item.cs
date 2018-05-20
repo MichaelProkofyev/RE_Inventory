@@ -54,27 +54,6 @@ public abstract class Item : EntityBase {
         }
     }
 
-    public void Move(MoveDirection direction)
-    {
-        Vector2Int movementAmount = Vector2Int.zero;
-        switch (direction)
-        {
-            case MoveDirection.UP:
-                movementAmount = Vector2Int.up;
-                break;
-            case MoveDirection.DOWN:
-                movementAmount = Vector2Int.down;
-                break;
-            case MoveDirection.LEFT:
-                movementAmount = Vector2Int.left;
-                break;
-            case MoveDirection.RIGHT:
-                movementAmount = Vector2Int.right;
-                break;
-        }
-        Position += movementAmount;
-    }
-
     public virtual void ToggleFlipX()
     {
         flippedX = !flippedX;
