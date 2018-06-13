@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ public enum ItemState
     PICKED
 }
 
+[Serializable]
 public struct ItemRect
 {
     public Vector2Int position;
@@ -25,12 +27,16 @@ public struct ItemRect
 
 public abstract class Item : EntityBase {
 
+    [SerializeField] private ItemRect useRange;
+
+    public ItemRect UseRange
+    { get
+        {
+            return new ItemRect(Position + useRange.position, useRange.width, useRange.height);
+        }
+    }
+
     public abstract void Use();
-
-    protected bool flippedX = false;
-    protected bool flippedY = false;
-
-    public abstract ItemRect UseRange { get; }
 
     public virtual void SetState(ItemState state)
     {
@@ -51,29 +57,6 @@ public abstract class Item : EntityBase {
                     sprite.transform.localScale = orignalScale * 1.1f;
                     break;
             }
-        }
-    }
-
-    public virtual void ToggleFlipX()
-    {
-        flippedX = !flippedX;
-        Flip(flippedX, flippedY);
-    }
-
-    public virtual void ToggleFlipY()
-    {
-        flippedY = !flippedY;
-        Flip(flippedX, flippedY);
-    }
-
-    public virtual void Flip(bool flipX, bool flipY)
-    {
-        flippedX = flipX;
-        flippedY = flipY;
-        foreach (var sprite in sprites)
-        {
-            sprite.flipX = flippedX;
-            sprite.flipY = flippedY;
         }
     }
 }

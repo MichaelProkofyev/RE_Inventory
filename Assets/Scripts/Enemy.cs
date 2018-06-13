@@ -8,7 +8,6 @@ public class Enemy : EntityBase, IDamagable, AIEntity {
 
     public void Act()
     {
-
         //print($"{gameObject.name} acting!");
 
         System.Func<MoveDirection, bool> tryMoving = (direction) =>

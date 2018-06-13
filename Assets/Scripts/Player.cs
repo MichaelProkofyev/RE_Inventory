@@ -59,20 +59,6 @@ public class Player : SingletonComponent<Player> {
             HandleInputDirection(MoveDirection.RIGHT);
         }
 
-        if (currentItem != null)
-        {
-            if (Input.GetKeyDown(KeyCode.Keypad8) || Input.GetKeyDown(KeyCode.Keypad2))
-            {
-                currentItem.ToggleFlipY();
-                OnPlayerAction();
-            }
-            else if (Input.GetKeyDown(KeyCode.Keypad4) || Input.GetKeyDown(KeyCode.Keypad6))
-            {
-                currentItem.ToggleFlipX();
-                OnPlayerAction();
-            }
-        }
-
         System.Func<Item> dropItem = () =>
         {
             Item droppedItem = currentItem;

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Inventory : SingletonComponent<Inventory> {
+public class Inventory : SingletonComponent<Inventory>
+{
 
     public enum ScanDirection
     {
@@ -19,7 +20,7 @@ public class Inventory : SingletonComponent<Inventory> {
     public EntityBase[,] slots = new EntityBase[inventotyWidth, inventotyHeight];
 
     private const int inventotyWidth = 10;
-    private const int inventotyHeight = 5;
+    private const int inventotyHeight = 10;
 
 
     //Should picked items be omitted ?
@@ -84,13 +85,12 @@ public class Inventory : SingletonComponent<Inventory> {
         }
     }
 
-    public List<T> AtRect<T>(Vector2Int position, int width, int height, ScanDirection scanDirection) where T : EntityBase
+    public List<T> AtRect<T>(ItemRect itemRect) where T : EntityBase
     {
-        //TODO: Use scan direction to sort the entries (LINQ?)
         List<T> foundEntities = new List<T>();
-        for (int x = position.x; x < position.x + width && x < slots.GetLength(0); x++)
+        for (int x = itemRect.position.x; x < itemRect.position.x + itemRect.width && x < slots.GetLength(0); x++)
         {
-            for (int y = position.y; y < position.y + height && y < slots.GetLength(1); y++)
+            for (int y = itemRect.position.y; y < itemRect.position.y + itemRect.height && y < slots.GetLength(1); y++)
             {
                 T slotEntity = slots[x, y] as T;
 
@@ -98,7 +98,6 @@ public class Inventory : SingletonComponent<Inventory> {
                 {
                     foundEntities.Add(slotEntity);
                 }
-
             }
         }
 
